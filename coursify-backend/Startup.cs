@@ -1,4 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using coursify_backend;
+using coursify_backend.Interfaces.IRepository;
+using coursify_backend.Interfaces.IService;
+using coursify_backend.Repository;
+using coursify_backend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -75,6 +81,11 @@ namespace Courses_Platform_Backend
                 };
             });
 
+            /* Add the DataConext */
+            services.AddDbContext<CoursifyContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             /* Inject Automapper */
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -82,7 +93,13 @@ namespace Courses_Platform_Backend
 
             /* Avoid Infinite loop when you bring nested json response (inculde method in EF)*/
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            
+            /* Inject the Repository */
+            services.AddScoped<IUserRepository, UserRepository>();
 
+            /* Inject the Service */
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IMiscService, MiscService>();
         }
 
 
