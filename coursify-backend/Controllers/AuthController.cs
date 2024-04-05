@@ -29,11 +29,14 @@ namespace coursify_backend.Controllers
         public async Task<IActionResult> Login([FromBody] AuthRequest authRequest)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string hashedPassword = _miscService.HashPassword(authRequest.Password);
+            if(!await _userRepository.IsRegistered(authRequest.Email))
+            {
+                return NotFound("L'adresse e-mail que vous avez saisie n'est connectée à aucun compte.");
+            }
             var authResponse = await _authService.AuthenticateAsync(authRequest);
             if (authResponse == null)
             {
-                return Unauthorized();
+                return Unauthorized("Mot de passse incorrect.");
             }
 
             return Ok(authResponse);

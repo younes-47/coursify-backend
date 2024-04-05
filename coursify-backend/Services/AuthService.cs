@@ -24,9 +24,6 @@ namespace coursify_backend.Services
         }
         public async Task<AuthResponse?> AuthenticateAsync(AuthRequest authRequest)
         {
-           bool isRegistered =  await _userRepository.IsRegistered(authRequest.Email);
-           if (!isRegistered) return null;
-
            UserCredential userCredential = await _userRepository.GetCredentialByEmailAsync(authRequest.Email);
 
            if(!_miscService.VerifyPassword(authRequest.Password, userCredential.Password))
