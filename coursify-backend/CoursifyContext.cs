@@ -286,9 +286,13 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.FirstName).HasMaxLength(20);
             entity.Property(e => e.LastName).HasMaxLength(20);
             entity.Property(e => e.Password).HasMaxLength(255);
+            entity.Property(e => e.EmailVerificationToken).HasMaxLength(255);
+            entity.Property(e => e.PasswordResetToken).HasMaxLength(255);
+            entity.Property(e => e.EmailVerifiedAt).HasColumnType("datetime");
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .HasDefaultValue("user");
+
         });
 
         OnModelCreatingPartial(modelBuilder);

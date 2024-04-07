@@ -19,6 +19,12 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
+    public string? PasswordResetToken { get; set; }
+
+    public string? EmailVerificationToken { get; set; }
+
+    public DateTime? EmailVerifiedAt { get; set; }
+
     public DateTime CreateDate { get; set; }
 
     public virtual List<Enrollment> Enrollments { get; set; } = new List<Enrollment>();

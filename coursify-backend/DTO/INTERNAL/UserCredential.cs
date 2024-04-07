@@ -1,4 +1,4 @@
-﻿namespace coursify_backend.DTO.GET
+﻿namespace coursify_backend.DTO.INTERNAL
 {
     public class UserCredential
     {

@@ -1,33 +1,69 @@
-﻿using coursify_backend.Interfaces.IService;
+﻿using coursify_backend.DTO.INTERNAL;
+using coursify_backend.Interfaces.IService;
+using coursify_backend.Models;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 using System.Security.Cryptography;
 
 namespace coursify_backend.Services
 {
     public class MiscService : IMiscService
     {
-        private const int SaltSize = 128 / 8; // 16 bytes
-        private const int KeySize = 256 / 8; // 32 bytes
-        private const int Iterations = 10000;
-        private static readonly HashAlgorithmName _hashAlgorithm = HashAlgorithmName.SHA256;
-        private const char Delimiter = ';';
+        private readonly IConfiguration _configuration;
 
-        public string HashPassword(string password)
+        public MiscService(IConfiguration configuration)
         {
-            byte[] salt = RandomNumberGenerator.GetBytes(SaltSize); // RandomNumberGenerator.Create()
-            byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, _hashAlgorithm, KeySize);
-
-            return string.Join(Delimiter, Convert.ToBase64String(salt), Convert.ToBase64String(hash));
+            _configuration = configuration;
         }
 
-        public bool VerifyPassword(string inputPassword, string hashedPassword)
+        public EmailDTO GenerateVerificationEmail(User user)
         {
-            string[] chunks = hashedPassword.Split(Delimiter);
-            byte[] salt = Convert.FromBase64String(chunks[0]);
-            byte[] actualHash = Convert.FromBase64String(chunks[1]);
+            string verificationLink = $"{_configuration["EmailSettings:CoursifyFrontendUrl"]}/Verify/token/{user.EmailVerificationToken}/email/{user.Email}";
 
-            byte[] hashedInput = Rfc2898DeriveBytes.Pbkdf2(inputPassword, salt, Iterations, _hashAlgorithm, KeySize);
+            TextPart emailBody = new(MimeKit.Text.TextFormat.Html)
+            {
+                Text = $@"
+                    <h1>Veuillez confirmer votre adresse e-mail pour vous inscrire</h1>
+                    <p>Merci d'avoir rejoint Coursify. Nous devons confirmer votre adresse e-mail. S'il vous plaît cliquer sur le lien ci-dessous.</p>
+                    <a href=""{verificationLink}"">Vérifier l'e-mail</a>
+                "
+            };
 
-            return CryptographicOperations.FixedTimeEquals(actualHash, hashedInput);
+            EmailDTO emailDTO = new()
+            {
+                To = user.Email,
+                Subject = "Vérifier votre e-mail",
+                Body = emailBody
+            };
+
+            return emailDTO;
         }
+
+        public bool SendEmail(EmailDTO emailDTO)
+        {
+            try
+            {
+                var email = new MimeMessage();
+                email.From.Add(new MailboxAddress("Coursify", _configuration["EmailSettings:EmailUsername"]));
+                email.To.Add(MailboxAddress.Parse(emailDTO.To));
+                email.Subject = emailDTO.Subject;
+                email.Body = emailDTO.Body;
+
+                using var smtp = new SmtpClient();
+                smtp.Connect(_configuration["EmailSettings:SmtpHost"], int.Parse(_configuration["EmailSettings:SmtpPort"]), SecureSocketOptions.StartTls);
+                smtp.Authenticate(_configuration["EmailSettings:EmailUsername"], _configuration["EmailSettings:EmailPassword"]);
+                smtp.Send(email);
+                smtp.Disconnect(true);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+
     }
 }

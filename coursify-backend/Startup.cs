@@ -100,6 +100,7 @@ namespace Courses_Platform_Backend
             /* Inject the Service */
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IMiscService, MiscService>();
+            services.AddScoped<IUserService, UserService>();
         }
 
 

@@ -1,8 +1,11 @@
-﻿namespace coursify_backend.Interfaces.IService
+﻿using coursify_backend.DTO.INTERNAL;
+using coursify_backend.Models;
+
+namespace coursify_backend.Interfaces.IService
 {
     public interface IMiscService
     {
-        string HashPassword(string password);
-        bool VerifyPassword(string password, string passwordHash);
+        EmailDTO GenerateVerificationEmail(User user);
+        bool SendEmail(EmailDTO emailDTO);
     }
 }

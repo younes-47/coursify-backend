@@ -21,6 +21,7 @@ namespace coursify_backend.DTO.POST
         public string Password { get; set; } = "";
 
         [Required(ErrorMessage = "La date de naissance est requise")]
+        [CustomValidation(typeof(RegisterRequest), "ValidateDateOfBirth")]
         [DataType(DataType.Date)]
         public DateOnly Birthdate { get; set; }
 
