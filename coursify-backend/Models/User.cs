@@ -23,7 +23,7 @@ public partial class User
 
     public string? EmailVerificationToken { get; set; }
 
-    //public string? RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
 
     public DateTime? EmailVerifiedAt { get; set; }
 

@@ -50,34 +50,35 @@ namespace coursify_backend.Controllers
             }
 
             // Set the refresh token in an http-only cookie
-            //HttpContext.Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
-            //{
-            //    Domain = "localhost",
-            //    Expires = DateTime.Now.AddDays(2),
-            //    HttpOnly = true,
-            //    Path = "/",
-            //});
+            HttpContext.Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
+            {
+                Domain = "localhost",
+                Expires = DateTime.Now.AddDays(1),
+                Secure = true,
+                HttpOnly = true,
+                Path = "/",
+            });
 
             return Ok(new {authResponse.AccessToken, authResponse.Role});
         }
 
-        //[HttpPost("refresh")]
-        //public async Task<IActionResult> Refresh()
-        //{
-        //    string? refreshToken = HttpContext.Request.Cookies["refreshToken"];
-        //    if (refreshToken == null)
-        //    {
-        //        return Unauthorized("REFRESH_TOKEN_NOT_FOUND");
-        //    }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            string? refreshToken = HttpContext.Request.Cookies["refreshToken"];
+            if (refreshToken == null)
+            {
+                return Unauthorized("REFRESH_TOKEN_NOT_FOUND");
+            }
 
-        //    AuthResponse? authResponse = await _authService.RefreshToken(refreshToken);
-        //    if (authResponse == null)
-        //    {
-        //        return Unauthorized("INVALID_REFRESH_TOKEN");
-        //    }
+            AuthResponse? authResponse = await _authService.RefreshToken(refreshToken);
+            if (authResponse == null)
+            {
+                return Unauthorized("INVALID_REFRESH_TOKEN");
+            }
 
-        //    return Ok(new { authResponse.AccessToken, authResponse.Role });
-        //}
+            return Ok(new { authResponse.AccessToken, authResponse.Role });
+        }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)

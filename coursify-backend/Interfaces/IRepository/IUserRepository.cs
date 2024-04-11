@@ -7,7 +7,7 @@ namespace coursify_backend.Interfaces.IRepository
     {
         Task<User> GetByEmailAsync(string email);
 
-        //Task<User?> GetByRefreshToken(string refreshToken);
+        Task<User?> GetByRefreshToken(string refreshToken);
         Task<bool> IsRegistered(string email);
 
         Task<bool> IsEmailVerified(string email);

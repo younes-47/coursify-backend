@@ -24,14 +24,14 @@ namespace coursify_backend.Repository
             return await _context.Users
                 .Where(u => u.Email == email)
                 .FirstAsync();
-        }   
+        }
 
-        //public async Task<User?> GetByRefreshToken(string refreshToken)
-        //{
-        //    return await _context.Users
-        //        .Where(u => u.RefreshToken == refreshToken)
-        //        .FirstOrDefaultAsync();
-        //}
+        public async Task<User?> GetByRefreshToken(string refreshToken)
+        {
+            return await _context.Users
+                .Where(u => u.RefreshToken == refreshToken)
+                .FirstOrDefaultAsync();
+        }
 
         public async Task<bool> IsRegistered(string email)
         {

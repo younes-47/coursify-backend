@@ -61,12 +61,12 @@ namespace coursify_backend.Services
                 AuthResponse authResponse = new()
                 {
                     AccessToken = CreateAccessToken(user),
-                    //RefreshToken = CreateRefreshToken(user),
+                    RefreshToken = CreateRefreshToken(user),
                     Role = user.Role
                 };
 
-                //user.RefreshToken = authResponse.RefreshToken;
-                //await _userRepository.Update(user);
+                user.RefreshToken = authResponse.RefreshToken;
+                await _userRepository.Update(user);
                 return authResponse;
             }
             catch (Exception)
@@ -75,39 +75,39 @@ namespace coursify_backend.Services
             }
         }
 
-        //public async Task<AuthResponse?> RefreshToken(string refreshToken)
-        //{
-        //    try
-        //    {
-        //        User? user = await _userRepository.GetByRefreshToken(refreshToken);
+        public async Task<AuthResponse?> RefreshToken(string refreshToken)
+        {
+            try
+            {
+                User? user = await _userRepository.GetByRefreshToken(refreshToken);
 
-        //        if (user == null)
-        //            return null;
+                if (user == null)
+                    return null;
 
-        //        if (user.RefreshToken != null && IsTokenExpired(user.RefreshToken))
-        //        {
-        //            user.RefreshToken = null;
-        //            await _userRepository.Update(user);
-        //            return null;
-        //        }
-                    
-        //        if(user.RefreshToken != refreshToken)
-        //            return null;
+                if (user.RefreshToken != null && IsTokenExpired(user.RefreshToken))
+                {
+                    user.RefreshToken = null;
+                    await _userRepository.Update(user);
+                    return null;
+                }
+
+                if (user.RefreshToken != refreshToken)
+                    return null;
 
 
-        //        AuthResponse authResponse = new()
-        //        {
-        //            AccessToken = CreateAccessToken(user),
-        //            Role = user.Role
-        //        };
+                AuthResponse authResponse = new()
+                {
+                    AccessToken = CreateAccessToken(user),
+                    Role = user.Role
+                };
 
-        //        return authResponse;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return null;
-        //    }
-        //}
+                return authResponse;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
         public string CreateAccessToken(User user)
         {
@@ -120,7 +120,7 @@ namespace coursify_backend.Services
                         new Claim(ClaimTypes.Name, user.Email),
                         new Claim(ClaimTypes.Role, user.Role)
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(30),
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -138,7 +138,7 @@ namespace coursify_backend.Services
                         new Claim(ClaimTypes.Name, user.Email),
                         new Claim(ClaimTypes.Role, user.Role)
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(40),
+                Expires = DateTime.UtcNow.AddDays(3),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
