@@ -36,9 +36,12 @@ namespace Courses_Platform_Backend
             {
                 options.AddPolicy("CorsPolicy", builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins("http://localhost:3000")
+                        .AllowCredentials()
+                        .WithExposedHeaders("Set-Cookie")
                         .AllowAnyMethod()
                         .AllowAnyHeader();
+                        
                 });
             });
 
@@ -71,10 +74,10 @@ namespace Courses_Platform_Backend
                         // the details about why the authentication has failed
                         if (context.AuthenticateFailure != null)
                         {
-                            context.Response.StatusCode = 401;
+                            context.Response.StatusCode = 403;
 
                             context.HttpContext.Response.Headers.Add("Token-Expired", "true");
-                            await context.HttpContext.Response.WriteAsync("TOKEN-EXPIRED");
+                            await context.HttpContext.Response.WriteAsync("TOKEN_EXPIRED");
                         }
                     }
 
@@ -116,8 +119,8 @@ namespace Courses_Platform_Backend
                 app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();
+            app.UseRouting(); 
             app.UseCors("CorsPolicy");
-            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
