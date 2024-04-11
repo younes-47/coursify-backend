@@ -6,6 +6,9 @@ namespace coursify_backend.Interfaces.IService
     public interface IMiscService
     {
         EmailDTO GenerateVerificationEmail(User user);
+
+        EmailDTO GeneratePasswordResetEmail(User user);
+
         bool SendEmail(EmailDTO emailDTO);
     }
 }

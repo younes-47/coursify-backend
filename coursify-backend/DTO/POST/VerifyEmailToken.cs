@@ -2,7 +2,7 @@
 
 namespace coursify_backend.DTO.POST
 {
-    public class VerifyEmail
+    public class VerifyEmailToken
     {
         [Required(ErrorMessage = "L'email est requis")]
         [EmailAddress(ErrorMessage = "Format d'email invalide")]

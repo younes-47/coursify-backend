@@ -6,6 +6,8 @@ namespace coursify_backend.Interfaces.IRepository
     public interface IUserRepository
     {
         Task<User> GetByEmailAsync(string email);
+
+        //Task<User?> GetByRefreshToken(string refreshToken);
         Task<bool> IsRegistered(string email);
 
         Task<bool> IsEmailVerified(string email);

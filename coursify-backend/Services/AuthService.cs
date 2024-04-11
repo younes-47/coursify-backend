@@ -51,15 +51,65 @@ namespace coursify_backend.Services
 
         public async Task<AuthResponse?> AuthenticateAsync(LoginRequest authRequest)
         {
-            User user = await _userRepository.GetByEmailAsync(authRequest.Email);
+            try
+            {
+                User user = await _userRepository.GetByEmailAsync(authRequest.Email);
 
-            if (!VerifyPassword(authRequest.Password, user.Password))
+                if (!VerifyPassword(authRequest.Password, user.Password))
+                    return null;
+
+                AuthResponse authResponse = new()
+                {
+                    AccessToken = CreateAccessToken(user),
+                    //RefreshToken = CreateRefreshToken(user),
+                    Role = user.Role
+                };
+
+                //user.RefreshToken = authResponse.RefreshToken;
+                //await _userRepository.Update(user);
+                return authResponse;
+            }
+            catch (Exception)
+            {
                 return null;
-
-            return CreateToken(user);
+            }
         }
 
-        public AuthResponse CreateToken(User user)
+        //public async Task<AuthResponse?> RefreshToken(string refreshToken)
+        //{
+        //    try
+        //    {
+        //        User? user = await _userRepository.GetByRefreshToken(refreshToken);
+
+        //        if (user == null)
+        //            return null;
+
+        //        if (user.RefreshToken != null && IsTokenExpired(user.RefreshToken))
+        //        {
+        //            user.RefreshToken = null;
+        //            await _userRepository.Update(user);
+        //            return null;
+        //        }
+                    
+        //        if(user.RefreshToken != refreshToken)
+        //            return null;
+
+
+        //        AuthResponse authResponse = new()
+        //        {
+        //            AccessToken = CreateAccessToken(user),
+        //            Role = user.Role
+        //        };
+
+        //        return authResponse;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
+
+        public string CreateAccessToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
@@ -70,14 +120,50 @@ namespace coursify_backend.Services
                         new Claim(ClaimTypes.Name, user.Email),
                         new Claim(ClaimTypes.Role, user.Role)
                 }),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddSeconds(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new AuthResponse { Token = tokenHandler.WriteToken(token), Role = user.Role};
+            return  tokenHandler.WriteToken(token);
+        }
+
+        public string CreateRefreshToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                        new Claim(ClaimTypes.Name, user.Email),
+                        new Claim(ClaimTypes.Role, user.Role)
+                }),
+                Expires = DateTime.UtcNow.AddSeconds(40),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         public string CreateEmailVerficiationToken(string email)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                        new Claim(ClaimTypes.Name, email),
+                        new Claim(ClaimTypes.Role, "user")
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public string CreatePasswordResetToken(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
