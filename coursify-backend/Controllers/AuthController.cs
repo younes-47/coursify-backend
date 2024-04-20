@@ -4,8 +4,10 @@ using coursify_backend.DTO.POST;
 using coursify_backend.DTO.PUT;
 using coursify_backend.Interfaces.IRepository;
 using coursify_backend.Interfaces.IService;
+using coursify_backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -62,19 +64,40 @@ namespace coursify_backend.Controllers
             return Ok(new {authResponse.AccessToken, authResponse.Role});
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            string? refreshToken = HttpContext.Request.Cookies["refreshToken"];
+            if (refreshToken == null)
+                return NoContent();
+
+            User? user = await _userRepository.GetByRefreshToken(refreshToken);
+            if (user == null)
+            {
+                HttpContext.Response.Cookies.Delete("refreshToken");
+                return NoContent();
+            }
+
+            user.RefreshToken = null;
+            await _userRepository.Update(user);
+            HttpContext.Response.Cookies.Delete("refreshToken");
+
+            return Ok();
+        }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
             string? refreshToken = HttpContext.Request.Cookies["refreshToken"];
             if (refreshToken == null)
             {
-                return Unauthorized("REFRESH_TOKEN_NOT_FOUND");
+                return BadRequest("REFRESH_TOKEN_NOT_FOUND");
             }
 
             AuthResponse? authResponse = await _authService.RefreshToken(refreshToken);
             if (authResponse == null)
             {
-                return Unauthorized("INVALID_REFRESH_TOKEN");
+                return BadRequest("INVALID_REFRESH_TOKEN");
             }
 
             return Ok(new { authResponse.AccessToken, authResponse.Role });

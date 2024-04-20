@@ -262,5 +262,58 @@ namespace coursify_backend.Services
 
             return result;
         }
+
+        public async Task<ProcessResult> UpdateProfile(User user, UpdateProfile updateProfileRequest)
+        {
+            var transaction = _coursifyContext.Database.BeginTransaction();
+            var result = new ProcessResult();
+            try
+            {
+                user.Avatar = updateProfileRequest.Avatar;
+                user.Birthdate = updateProfileRequest.Birthdate;
+                user.FirstName = updateProfileRequest.FirstName;
+                user.LastName = updateProfileRequest.LastName;
+                await _userRepository.Update(user);
+
+                await transaction.CommitAsync();
+                result.Success = true;
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+                result.Success = false;
+                result.Message = e.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ProcessResult> ChangePassword(User user, ChangePassword changePasswordRequest)
+        {
+            var transaction = _coursifyContext.Database.BeginTransaction();
+            var result = new ProcessResult();
+            try
+            {
+                if (!_authService.VerifyPassword(changePasswordRequest.CurrentPassword, user.Password))
+                {
+                    result.Success = false;
+                    result.Message = "INVALID_PASSWORD";
+                    return result;
+                }
+                user.Password = _authService.HashPassword(changePasswordRequest.NewPassword);
+                await _userRepository.Update(user);
+
+                await transaction.CommitAsync();
+                result.Success = true;
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+                result.Success = false;
+                result.Message = e.Message;
+            }
+
+            return result;
+        }
     }
 }

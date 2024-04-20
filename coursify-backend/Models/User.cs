@@ -13,6 +13,8 @@ public partial class User
 
     public DateOnly Birthdate { get; set; }
 
+    public string Avatar { get; set; } = null!;
+
     public string Role { get; set; } = null!;
 
     public string Email { get; set; } = null!;

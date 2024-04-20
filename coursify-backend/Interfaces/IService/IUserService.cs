@@ -1,6 +1,7 @@
 ﻿using coursify_backend.DTO.INTERNAL;
 using coursify_backend.DTO.POST;
 using coursify_backend.DTO.PUT;
+using coursify_backend.Models;
 
 namespace coursify_backend.Interfaces.IService
 {
@@ -12,5 +13,8 @@ namespace coursify_backend.Interfaces.IService
         Task<ProcessResult> SendVerficationEmail(string email);
         Task<ProcessResult> SendPasswordResetEmail(string email);
         Task<ProcessResult> ResetPassword(ResetPassword resetPassword);
+        Task<ProcessResult> UpdateProfile(User user, UpdateProfile updateProfileRequest);
+
+        Task<ProcessResult> ChangePassword(User user, ChangePassword changePasswordRequest);
     }
 }

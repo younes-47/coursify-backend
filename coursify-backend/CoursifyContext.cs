@@ -290,6 +290,9 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.PasswordResetToken).HasMaxLength(255);
             entity.Property(e => e.RefreshToken).HasMaxLength(255);
             entity.Property(e => e.EmailVerifiedAt).HasColumnType("datetime");
+            entity.Property(e => e.Avatar)
+                 .HasMaxLength(10)
+                 .HasDefaultValue("AVATAR0");
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .HasDefaultValue("user");
