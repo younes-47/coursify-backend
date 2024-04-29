@@ -15,9 +15,9 @@ public partial class Question
 
     public DateTime CreateDate { get; set; }
 
+    public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
+
     public virtual Evaluation? Evaluation { get; set; }
 
     public virtual Quiz? Quiz { get; set; }
-
-    public virtual List<Answer> Answers { get; set; } = new List<Answer>();
 }

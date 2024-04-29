@@ -3,19 +3,17 @@ using coursify_backend.Interfaces.IService;
 using coursify_backend.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.AspNetCore.Hosting;
 using MimeKit;
 using System.Security.Cryptography;
 
 namespace coursify_backend.Services
 {
-    public class MiscService : IMiscService
+    public class MiscService(IConfiguration configuration,
+        IWebHostEnvironment webHostEnvironment) : IMiscService
     {
-        private readonly IConfiguration _configuration;
-
-        public MiscService(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        private readonly IConfiguration _configuration = configuration;
+        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
         public EmailDTO GenerateVerificationEmail(User user)
         {
@@ -116,6 +114,25 @@ namespace coursify_backend.Services
             }
         }
 
+        public FileDetails GetFileDetails(Byte[] file, string fileExtenstion, int courseId)
+        {
 
+            var dirPath = Path.Combine(_webHostEnvironment.WebRootPath, courseId.ToString());
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            var uniqueFileName = Guid.NewGuid().ToString() + fileExtenstion;
+
+            var filePath = Path.Combine(dirPath, uniqueFileName);
+
+            FileDetails fileDetails = new()
+            {
+                FileData = file,
+                FilePath = filePath,
+            };
+
+            return fileDetails;
+        }
     }
 }

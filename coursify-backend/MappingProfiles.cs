@@ -17,6 +17,8 @@ namespace coursify_backend
 
             CreateMap<User, UserInfo>();
 
+            CreateMap<Category, CategoryDTO>();
+
         }
     }
 }

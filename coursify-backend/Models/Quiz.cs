@@ -7,13 +7,11 @@ public partial class Quiz
 {
     public int Id { get; set; }
 
-    public int SectionId { get; set; }
+    public int CourseId { get; set; }
 
     public DateTime CreateDate { get; set; }
 
-    public virtual List<Answer> Answers { get; set; } = new List<Answer>();
+    public virtual Course Course { get; set; } = null!;
 
-    public virtual List<Question> Questions { get; set; } = new List<Question>();
-
-    public virtual Section Section { get; set; } = null!;
+    public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }

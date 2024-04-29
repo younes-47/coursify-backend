@@ -13,7 +13,7 @@ public partial class Answer
 
     public bool IsCorrect { get; set; }
 
-    public DateTime CreateDate { get; set; }
+    public DateTime? CreateDate { get; set; }
 
     public virtual Question Question { get; set; } = null!;
 }

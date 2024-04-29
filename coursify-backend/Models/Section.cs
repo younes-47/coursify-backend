@@ -15,11 +15,7 @@ public partial class Section
 
     public virtual Course Course { get; set; } = null!;
 
-    public virtual Quiz Quiz { get; set; } = null!;
+    public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
 
-    public virtual List<Document> Documents { get; set; } = new List<Document>();
-
-    public virtual List<Slide> Slides { get; set; } = new List<Slide>();
-
-    public virtual List<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
+    public virtual ICollection<Slide> Slides { get; set; } = new List<Slide>();
 }

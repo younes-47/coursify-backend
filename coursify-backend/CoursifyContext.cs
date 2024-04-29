@@ -43,22 +43,18 @@ public partial class CoursifyContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Answer>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Answer__3214EC071D8F2D9A");
+            entity.HasKey(e => e.Id).HasName("PK__Answer__3214EC07CE8CFCC1");
 
             entity.ToTable("Answer");
 
-            entity.Property(e => e.AnswerText)
-                .HasMaxLength(255)
-                .HasColumnName("Answer");
+            entity.Property(e => e.AnswerText).HasMaxLength(255);
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.IsCorrect).HasColumnName("isCorrect");
 
             entity.HasOne(d => d.Question).WithMany(p => p.Answers)
                 .HasForeignKey(d => d.QuestionId)
@@ -84,16 +80,15 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("Course");
 
+            entity.HasIndex(e => e.CategoryId, "IX_Course_CategoryId");
+
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.Title).HasMaxLength(255);
 
-            entity.HasOne(d => d.Evaluation).WithOne(p => p.Course)
-                .HasForeignKey<Evaluation>(d => d.CourseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_COURSE_EVALUATION");
+            entity.HasOne(d => d.Category).WithMany(p => p.Courses).HasForeignKey(d => d.CategoryId);
         });
 
         modelBuilder.Entity<Document>(entity =>
@@ -101,6 +96,8 @@ public partial class CoursifyContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Document__3214EC0738060B46");
 
             entity.ToTable("Document");
+
+            entity.HasIndex(e => e.SectionId, "IX_Document_SectionId");
 
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
@@ -118,6 +115,10 @@ public partial class CoursifyContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Enrollme__3214EC074CB7170A");
 
             entity.ToTable("Enrollment");
+
+            entity.HasIndex(e => e.CourseId, "IX_Enrollment_CourseId");
+
+            entity.HasIndex(e => e.UserId, "IX_Enrollment_UserId");
 
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
@@ -140,6 +141,8 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("Evaluation");
 
+            entity.HasIndex(e => e.CourseId, "IX_Evaluation_CourseId").IsUnique();
+
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -155,6 +158,10 @@ public partial class CoursifyContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Evaluati__3214EC074BDEBF90");
 
             entity.ToTable("EvaluationAttempt");
+
+            entity.HasIndex(e => e.EvaluationId, "IX_EvaluationAttempt_EvaluationId");
+
+            entity.HasIndex(e => e.UserId, "IX_EvaluationAttempt_UserId");
 
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
@@ -181,6 +188,10 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("Question");
 
+            entity.HasIndex(e => e.EvaluationId, "IX_Question_EvaluationId");
+
+            entity.HasIndex(e => e.QuizId, "IX_Question_QuizId");
+
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -203,12 +214,14 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("Quiz");
 
+            entity.HasIndex(e => e.CourseId, "IX_Quiz_CourseId").IsUnique();
+
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Section).WithOne(p => p.Quiz)
-                .HasForeignKey<Quiz>(d => d.SectionId)
+            entity.HasOne(d => d.Course).WithOne(p => p.Quiz)
+                .HasForeignKey<Quiz>(d => d.CourseId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SECTION_QUIZ");
         });
@@ -219,12 +232,17 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("QuizAttempt");
 
+            entity.HasIndex(e => e.CourseId, "IX_QuizAttempt_CourseId");
+
+            entity.HasIndex(e => e.UserId, "IX_QuizAttempt_UserId");
+
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.Score).HasColumnType("decimal(4, 2)");
 
-            entity.HasOne(d => d.Section).WithMany(p => p.QuizAttempts)
-                .HasForeignKey(d => d.SectionId)
+            entity.HasOne(d => d.Course).WithMany(p => p.QuizAttempts)
+                .HasForeignKey(d => d.CourseId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SECTION_QUIZ_ATTEMPT");
 
@@ -240,6 +258,8 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("Section");
 
+            entity.HasIndex(e => e.CourseId, "IX_Section_CourseId");
+
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -249,11 +269,6 @@ public partial class CoursifyContext : DbContext
                 .HasForeignKey(d => d.CourseId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_COURSE_SECTION");
-
-            entity.HasOne(d => d.Quiz).WithOne(p => p.Section)
-                .HasForeignKey<Quiz>(d => d.SectionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SECTION_QUIZ");
         });
 
         modelBuilder.Entity<Slide>(entity =>
@@ -261,6 +276,8 @@ public partial class CoursifyContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Slide__3214EC07470D4E06");
 
             entity.ToTable("Slide");
+
+            entity.HasIndex(e => e.SectionId, "IX_Slide_SectionId");
 
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
@@ -279,24 +296,23 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("User");
 
+            entity.Property(e => e.Avatar)
+                .HasMaxLength(10)
+                .HasDefaultValue("AVATAR0");
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.EmailVerificationToken).HasMaxLength(255);
+            entity.Property(e => e.EmailVerifiedAt).HasColumnType("datetime");
             entity.Property(e => e.FirstName).HasMaxLength(20);
             entity.Property(e => e.LastName).HasMaxLength(20);
             entity.Property(e => e.Password).HasMaxLength(255);
-            entity.Property(e => e.EmailVerificationToken).HasMaxLength(255);
             entity.Property(e => e.PasswordResetToken).HasMaxLength(255);
             entity.Property(e => e.RefreshToken).HasMaxLength(255);
-            entity.Property(e => e.EmailVerifiedAt).HasColumnType("datetime");
-            entity.Property(e => e.Avatar)
-                 .HasMaxLength(10)
-                 .HasDefaultValue("AVATAR0");
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .HasDefaultValue("user");
-
         });
 
         OnModelCreatingPartial(modelBuilder);

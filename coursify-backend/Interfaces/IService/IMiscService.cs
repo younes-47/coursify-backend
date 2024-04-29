@@ -10,5 +10,7 @@ namespace coursify_backend.Interfaces.IService
         EmailDTO GeneratePasswordResetEmail(User user);
 
         bool SendEmail(EmailDTO emailDTO);
+
+        FileDetails GetFileDetails(Byte[] file, string fileExtenstion, int courseId);
     }
 }

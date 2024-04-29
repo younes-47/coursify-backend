@@ -99,11 +99,21 @@ namespace Courses_Platform_Backend
             
             /* Inject the Repository */
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<ISectionRepository, SectionRepository>();
+            services.AddScoped<ISlideRepository, SlideRepository>();
+            services.AddScoped<IDocumentRepository, DocumentRepository>();
+            services.AddScoped<IEvaluationRepository, EvaluationRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IAnswerRepository, AnswerRepository>();
+            services.AddScoped<IQuizRepository, QuizRepository>();
 
             /* Inject the Service */
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IMiscService, MiscService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAdminService, AdminService>();
         }
 
 

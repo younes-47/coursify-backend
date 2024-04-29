@@ -15,11 +15,15 @@ public partial class Course
 
     public DateTime CreateDate { get; set; }
 
-    public virtual Evaluation Evaluation { get; set; } = null!;
-
     public virtual Category Category { get; set; } = null!;
 
-    public virtual List<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
-    public virtual List<Section> Sections { get; set; } = new List<Section>();
+    public virtual Evaluation? Evaluation { get; set; }
+
+    public virtual Quiz? Quiz { get; set; }
+
+    public virtual ICollection<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
+
+    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 }

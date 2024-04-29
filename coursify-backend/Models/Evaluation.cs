@@ -13,7 +13,7 @@ public partial class Evaluation
 
     public virtual Course Course { get; set; } = null!;
 
-    public virtual List<EvaluationAttempt> EvaluationAttempts { get; set; } = new List<EvaluationAttempt>();
+    public virtual ICollection<EvaluationAttempt> EvaluationAttempts { get; set; } = new List<EvaluationAttempt>();
 
-    public virtual List<Question> Questions { get; set; } = new List<Question>();
+    public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }

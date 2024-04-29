@@ -170,14 +170,14 @@ namespace coursify_backend.Services
                         return result;
                     }
                 }
-                user.EmailVerificationToken = _authService.CreateEmailVerficiationToken(email);
-                await _userRepository.Update(user);
+                user.EmailVerificationToken = _authService.CreateEmailVerficiationToken(email);     
                 EmailDTO emailDTO = _miscService.GenerateVerificationEmail(user);
                 result.Success = _miscService.SendEmail(emailDTO);
                 if (!result.Success)
                 {
                     result.Message = "ERR_SENDING_EMAIL";
                 }
+                await _userRepository.Update(user);
             }
             catch (Exception e)
             {
@@ -203,14 +203,14 @@ namespace coursify_backend.Services
                         return result;
                     }
                 }
-                user.PasswordResetToken = _authService.CreatePasswordResetToken(email);
-                await _userRepository.Update(user);
+                user.PasswordResetToken = _authService.CreatePasswordResetToken(email);    
                 EmailDTO emailDTO = _miscService.GeneratePasswordResetEmail(user);
                 result.Success = _miscService.SendEmail(emailDTO);
                 if (!result.Success)
                 {
                     result.Message = "Échec de l'envoi de l'e-mail de réinitialisation du mot de passe";
                 }
+                await _userRepository.Update(user);
             }
             catch (Exception e)
             {
@@ -269,7 +269,7 @@ namespace coursify_backend.Services
             var result = new ProcessResult();
             try
             {
-                user.Avatar = updateProfileRequest.Avatar;
+                if (user.Role == "user") user.Avatar = updateProfileRequest.Avatar;
                 user.Birthdate = updateProfileRequest.Birthdate;
                 user.FirstName = updateProfileRequest.FirstName;
                 user.LastName = updateProfileRequest.LastName;
