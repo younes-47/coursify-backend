@@ -1,5 +1,6 @@
 ﻿using coursify_backend.Interfaces.IRepository;
 using coursify_backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace coursify_backend.Repository
 {
@@ -11,6 +12,20 @@ namespace coursify_backend.Repository
         {
             await _coursifyContext.Questions.AddAsync(question);
             return await _coursifyContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteCollection(ICollection<Question> questions)
+        {
+            _coursifyContext.Questions.RemoveRange(questions);
+            return await _coursifyContext.SaveChangesAsync() > 0;         
+        }
+
+        public async Task<int> GetCorrectAnswerId(int questionId)
+        {
+            return await _coursifyContext.Answers
+                .Where(a => a.QuestionId == questionId && a.IsCorrect == true)
+                .Select(a => a.Id)
+                .FirstAsync();
         }
     }
 }

@@ -18,6 +18,14 @@ namespace coursify_backend.Repository
             _mapper = mapper;
         }
 
+        public async Task<int> GetIdByEmail(string email)
+        {
+            return await _context.Users
+                .Where(u => u.Email == email)
+                .Select(u => u.Id)
+                .FirstAsync();
+        }
+
 
         public async Task<User> GetByEmailAsync(string email)
         {
@@ -53,6 +61,16 @@ namespace coursify_backend.Repository
         {
             _context.Users.Update(user);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<int> GetTotalAdmins()
+        {
+            return await _context.Users.CountAsync(u => u.Role == "admin");
+        }
+
+        public async Task<int> GetTotalUsers()
+        {
+            return await _context.Users.CountAsync(u => u.Role == "user");
         }
     }
 }

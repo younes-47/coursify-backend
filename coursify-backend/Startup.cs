@@ -38,9 +38,9 @@ namespace Courses_Platform_Backend
                 {
                     builder.WithOrigins("http://localhost:3000")
                         .AllowCredentials()
-                        .WithExposedHeaders("Set-Cookie")
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .WithExposedHeaders("Set-Cookie");
                         
                 });
             });
@@ -94,10 +94,10 @@ namespace Courses_Platform_Backend
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
-            /* Avoid Infinite loop when you bring nested json response (inculde method in EF)*/
+            /* Avoid Infinite loop when you bring nested json response (inculde method in EF) YOU CAN DELETE THIS */
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             
-            /* Inject the Repository */
+            /* Inject the Repositories */
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ICourseRepository, CourseRepository>();
@@ -108,16 +108,17 @@ namespace Courses_Platform_Backend
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddScoped<IAnswerRepository, AnswerRepository>();
             services.AddScoped<IQuizRepository, QuizRepository>();
+            services.AddScoped<IEnrollementRepository, EnrollementRepository>();
+            services.AddScoped<IQuizAttempRepository, QuizAttemptRepository>();
+            services.AddScoped<IEvaluationAttemptRepository, EvaluationAttemptRepository>();
 
-            /* Inject the Service */
+            /* Inject the Services */
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IMiscService, MiscService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IEvaluationService, EvaluationService>();
         }
-
-
-
 
 
 
@@ -128,9 +129,10 @@ namespace Courses_Platform_Backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseHttpsRedirection();
-            app.UseRouting(); 
+            
             app.UseCors("CorsPolicy");
+            app.UseHttpsRedirection();
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

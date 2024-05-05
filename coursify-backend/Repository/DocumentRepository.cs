@@ -12,5 +12,11 @@ namespace coursify_backend.Repository
            await _context.Documents.AddAsync(document);
            return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> DeleteCollection(ICollection<Document> documents)
+        {
+            _context.Documents.RemoveRange(documents);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

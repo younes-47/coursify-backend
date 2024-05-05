@@ -9,7 +9,7 @@ public partial class Slide
 
     public int SectionId { get; set; }
 
-    public string SlidePath { get; set; } = null!;
+    public string SlideName { get; set; } = null!;
 
     public DateTime CreateDate { get; set; }
 

@@ -85,6 +85,12 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+
+            entity.Property(e => e.Cover)
+                .HasDefaultValue("PLACEHOLDER")
+                .HasMaxLength(255)
+                .HasColumnName("Cover");
+
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.Title).HasMaxLength(255);
 
@@ -102,7 +108,7 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.DocumentPath).HasMaxLength(255);
+            entity.Property(e => e.DocumentName).HasMaxLength(255);
 
             entity.HasOne(d => d.Section).WithMany(p => p.Documents)
                 .HasForeignKey(d => d.SectionId)
@@ -166,10 +172,8 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Result)
-                .HasMaxLength(20)
-                .HasDefaultValue("refused");
-            entity.Property(e => e.Score).HasColumnType("decimal(4, 2)");
+
+            entity.Property(e => e.Score).HasColumnType("decimal(5, 2)");
 
             entity.HasOne(d => d.Evaluation).WithMany(p => p.EvaluationAttempts)
                 .HasForeignKey(d => d.EvaluationId)
@@ -232,7 +236,7 @@ public partial class CoursifyContext : DbContext
 
             entity.ToTable("QuizAttempt");
 
-            entity.HasIndex(e => e.CourseId, "IX_QuizAttempt_CourseId");
+            entity.HasIndex(e => e.QuizId, "IX_QuizAttempt_QuizId");
 
             entity.HasIndex(e => e.UserId, "IX_QuizAttempt_UserId");
 
@@ -241,10 +245,10 @@ public partial class CoursifyContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Score).HasColumnType("decimal(4, 2)");
 
-            entity.HasOne(d => d.Course).WithMany(p => p.QuizAttempts)
-                .HasForeignKey(d => d.CourseId)
+            entity.HasOne(d => d.Quiz).WithMany(p => p.QuizAttempts)
+                .HasForeignKey(d => d.QuizId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SECTION_QUIZ_ATTEMPT");
+                .HasConstraintName("FK_QUIZ_QUIZ_ATTEMPT");
 
             entity.HasOne(d => d.User).WithMany(p => p.QuizAttempts)
                 .HasForeignKey(d => d.UserId)
@@ -282,7 +286,7 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.SlidePath).HasMaxLength(255);
+            entity.Property(e => e.SlideName).HasMaxLength(255);
 
             entity.HasOne(d => d.Section).WithMany(p => p.Slides)
                 .HasForeignKey(d => d.SectionId)

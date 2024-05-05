@@ -19,6 +19,8 @@ namespace coursify_backend
 
             CreateMap<Category, CategoryDTO>();
 
+            CreateMap<Course, CourseAdminTableDTO>();
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using coursify_backend.DTO.GET;
+using coursify_backend.DTO.INTERNAL;
 using coursify_backend.DTO.POST;
 using coursify_backend.DTO.PUT;
 using coursify_backend.Interfaces.IRepository;
@@ -16,13 +17,17 @@ namespace coursify_backend.Controllers
         IMapper mapper,
         IUserRepository userRepository,
         IUserService userService,
-        IAdminService adminService,
+        ICourseService adminService,
+        ICourseRepository courseRepository,
+        ICourseService courseService,
         ICategoryRepository categoryRepository) : Controller
     {
         private readonly IMapper _mapper = mapper;
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IUserService _userService = userService;
-        private readonly IAdminService _adminService = adminService;
+        private readonly ICourseService _adminService = adminService;
+        private readonly ICourseRepository _courseRepository = courseRepository;
+        private readonly ICourseService _courseService = courseService;
         private readonly ICategoryRepository _categoryRepository = categoryRepository;
 
         [HttpGet("Info")]
@@ -77,6 +82,38 @@ namespace coursify_backend.Controllers
                 return BadRequest(result.Message);
 
             return Ok();
+        }
+
+        [HttpGet("course/all")]
+        public async Task<IActionResult> GetAllCourses()
+        {
+            List<CourseAdminTableDTO> courses = await _courseRepository.GetAll();
+            return Ok(courses);
+        }
+
+        [HttpDelete("course/delete")]
+        public async Task<IActionResult> DeleteCourse(int courseId)
+        {
+            bool doesExist = await _courseRepository.IsExisted(courseId);
+            if (!doesExist) return NotFound("COURSE_NOT_FOUND");
+
+            ProcessResult result = await _courseService.DeleteCourse(courseId);
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result.Id);
+        }
+
+        [HttpGet("insights")]
+        public async Task<IActionResult> GetInsights()
+        {
+            AdminInsightsDTO insights = new()
+            {
+                TotalUsers = await _userRepository.GetTotalUsers(),
+                TotalCourses = await _courseRepository.GetTotal(),
+                TotalAdmins = await _userRepository.GetTotalAdmins()
+            };
+            return Ok(insights);
         }
     }
 }

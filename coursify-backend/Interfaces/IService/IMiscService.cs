@@ -11,6 +11,6 @@ namespace coursify_backend.Interfaces.IService
 
         bool SendEmail(EmailDTO emailDTO);
 
-        FileDetails GetFileDetails(Byte[] file, string fileExtenstion, int courseId);
+        bool DeleteWholeFolder(int courseId);
     }
 }

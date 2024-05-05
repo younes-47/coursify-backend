@@ -9,7 +9,7 @@ public partial class Document
 
     public int SectionId { get; set; }
 
-    public string DocumentPath { get; set; } = null!;
+    public string DocumentName { get; set; } = null!;
 
     public DateTime CreateDate { get; set; }
 

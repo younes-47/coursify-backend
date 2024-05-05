@@ -3,8 +3,10 @@ using coursify_backend.DTO.POST;
 
 namespace coursify_backend.Interfaces.IService
 {
-    public interface IAdminService
+    public interface ICourseService
     {
         Task<ProcessResult> AddCourse(AddCourseDTO addCourseDTO);
+
+        Task<ProcessResult> DeleteCourse(int courseId);
     }
 }

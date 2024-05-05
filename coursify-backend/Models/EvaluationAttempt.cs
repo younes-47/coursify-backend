@@ -13,7 +13,7 @@ public partial class EvaluationAttempt
 
     public decimal Score { get; set; }
 
-    public string Result { get; set; } = null!;
+    public bool IsPassed { get; set; }
 
     public DateTime CreateDate { get; set; }
 

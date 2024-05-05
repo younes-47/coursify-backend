@@ -11,6 +11,8 @@ public partial class Course
 
     public string? Description { get; set; }
 
+    public string? Cover { get; set; }
+
     public int CategoryId { get; set; }
 
     public DateTime CreateDate { get; set; }
@@ -22,8 +24,6 @@ public partial class Course
     public virtual Evaluation? Evaluation { get; set; }
 
     public virtual Quiz? Quiz { get; set; }
-
-    public virtual ICollection<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 }

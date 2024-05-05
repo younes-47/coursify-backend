@@ -12,5 +12,11 @@ namespace coursify_backend.Repository
             await _context.Quizzes.AddAsync(quiz);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> Delete(Quiz quiz)
+        {
+            _context.Quizzes.Remove(quiz);
+            return await _context.SaveChangesAsync() > 0;   
+        }
     }
 }

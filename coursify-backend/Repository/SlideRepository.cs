@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace coursify_backend.Repository
 {
-    public class SlideRepository(CoursifyContext context,
-        IWebHostEnvironment webHostEnvironment) : ISlideRepository
+    public class SlideRepository(CoursifyContext context) : ISlideRepository
     {
         private readonly CoursifyContext _context = context;
-        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
         public async Task<bool> Add(Slide slide)
         {
@@ -17,6 +15,10 @@ namespace coursify_backend.Repository
            return await _context.SaveChangesAsync() > 0;
         }
 
-        
+        public async Task<bool> DeleteCollection(ICollection<Slide> slides)
+        {
+            _context.Slides.RemoveRange(slides);
+            return await _context.SaveChangesAsync() > 0;  
+        }
     }
 }

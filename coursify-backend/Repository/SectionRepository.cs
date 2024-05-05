@@ -13,6 +13,11 @@ namespace coursify_backend.Repository
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> DeleteCollection(ICollection<Section> sections)
+        {
+            _context.Sections.RemoveRange(sections);
+            return await _context.SaveChangesAsync() > 0;
+        }
 
     }
 }

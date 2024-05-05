@@ -12,5 +12,11 @@ namespace coursify_backend.Repository
             await _coursifyContext.Answers.AddAsync(answer);
             return await _coursifyContext.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> DeleteCollection(ICollection<Answer> answers)
+        {
+            _coursifyContext.Answers.RemoveRange(answers);
+            return await _coursifyContext.SaveChangesAsync() > 0;
+        }
     }
 }

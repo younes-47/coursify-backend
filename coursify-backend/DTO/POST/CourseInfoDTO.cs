@@ -15,6 +15,7 @@ namespace coursify_backend.DTO.POST
         [Required(ErrorMessage = "La categorie de la course est requis")]
         public int CourseCategoryId { get; set; }
 
-        //public string CourseImage { get; set; } = null!;
+        // Not required
+        public Byte[]? CourseCover { get; set; }
     }
 }

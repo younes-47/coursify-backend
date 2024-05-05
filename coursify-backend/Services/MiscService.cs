@@ -114,25 +114,16 @@ namespace coursify_backend.Services
             }
         }
 
-        public FileDetails GetFileDetails(Byte[] file, string fileExtenstion, int courseId)
+        public bool DeleteWholeFolder(int courseId)
         {
-
             var dirPath = Path.Combine(_webHostEnvironment.WebRootPath, courseId.ToString());
-            if (!Directory.Exists(dirPath))
+            if (Directory.Exists(dirPath))
             {
-                Directory.CreateDirectory(dirPath);
+                Directory.Delete(dirPath, true);
+                return true;
             }
-            var uniqueFileName = Guid.NewGuid().ToString() + fileExtenstion;
-
-            var filePath = Path.Combine(dirPath, uniqueFileName);
-
-            FileDetails fileDetails = new()
-            {
-                FileData = file,
-                FilePath = filePath,
-            };
-
-            return fileDetails;
+            return false;      
         }
+        
     }
 }
