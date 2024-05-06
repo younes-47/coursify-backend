@@ -106,5 +106,15 @@ namespace coursify_backend.Controllers
             return Ok(courseInfos);
         }
 
+        [HttpGet("course/content")]
+        public async Task<IActionResult> GetCourseContent([FromQuery] int courseId)
+        {
+            if(!await _courseRepository.IsExisted(courseId))
+                return NotFound("COURSE_NOT_FOUND");
+
+            CourseContentDTO courseContent = await _courseRepository.GetContent(courseId);
+            return Ok(courseContent);
+        }
+
     }
 }

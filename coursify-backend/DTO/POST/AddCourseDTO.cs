@@ -8,7 +8,7 @@ namespace coursify_backend.DTO.POST
         public CourseInfoDTO CourseInfo { get; set; } = null!;
 
         [Required(ErrorMessage = "Les sections d'une course sont requis")]
-        public SectionsDTO[] Sections { get; set; } = null!;
+        public SectionDTO[] Sections { get; set; } = null!;
 
         // not required
         public EvaluationQuestionsDTO[] EvaluationQuestions { get; set; } = null!;

@@ -2,7 +2,7 @@
 
 namespace coursify_backend.DTO.POST
 {
-    public class SectionsDTO
+    public class SectionDTO
     {
         [Required(ErrorMessage = "Le titre d'une section est requis")]
         [StringLength(255, MinimumLength = 1, ErrorMessage = "Le titre d'une section doit comporter entre 1 et 255 caractères")]

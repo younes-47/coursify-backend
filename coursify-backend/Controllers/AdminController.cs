@@ -13,6 +13,7 @@ namespace coursify_backend.Controllers
 {
     [Route("api/[controller]")]
     [Authorize(Roles = "admin")]
+    [DisableRequestSizeLimit]
     public class AdminController(
         IMapper mapper,
         IUserRepository userRepository,

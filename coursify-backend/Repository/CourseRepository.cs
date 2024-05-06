@@ -1,4 +1,5 @@
 ﻿using coursify_backend.DTO.GET;
+using coursify_backend.DTO.POST;
 using coursify_backend.Interfaces.IRepository;
 using coursify_backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -77,8 +78,8 @@ namespace coursify_backend.Repository
                 Category = c.Category.Title,
                 Cover = c.Cover != "PLACEHOLDER" ? File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{c.Cover}") : null,
                 TotalSections = c.Sections.Count,
-                TotalSlides = c.Sections.Select(s => s.Slides.Count).Count(),
-                TotalDocuments = c.Sections.Select(s => s.Documents.Count).Count(),
+                TotalSlides = c.Sections.SelectMany(s => s.Slides).Count(),
+                TotalDocuments = c.Sections.SelectMany(s => s.Documents).Count(),
                 IsEnrolled = c.Enrollments.Any(e => e.User.Email == email)
             })
             .ToListAsync();
@@ -116,11 +117,32 @@ namespace coursify_backend.Repository
                     Category = c.Category.Title,
                     Cover = c.Cover != "PLACEHOLDER" ? File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{c.Cover}") : null,
                     TotalSections = c.Sections.Count,
-                    TotalSlides = c.Sections.Select(s => s.Slides.Count).Count(),
-                    TotalDocuments = c.Sections.Select(s => s.Documents.Count).Count(),
+                    TotalSlides = c.Sections.SelectMany(s => s.Slides).Count(),
+                    TotalDocuments = c.Sections.SelectMany(s => s.Documents).Count(),
                     IsEnrolled = true
                 })
                 .ToListAsync();
+        }
+
+        public async Task<CourseContentDTO> GetContent(int courseId)
+        {
+            return await _context.Courses
+                .Include(c => c.Sections)
+                .ThenInclude(s => s.Slides)
+                .Include(c => c.Sections)
+                .ThenInclude(s => s.Documents)
+                .Select(c => new CourseContentDTO
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Sections = c.Sections.Select(s => new SectionDTO
+                    {
+                        Title = s.Title,
+                        Slides = s.Slides.Select(s => File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{s.SlideName}")).ToList(),
+                        Documents = s.Documents.Select(d => File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{d.DocumentName}")).ToList()
+                    }).ToList()
+                })
+                .FirstAsync(c => c.Id == courseId);
         }
        
     }
