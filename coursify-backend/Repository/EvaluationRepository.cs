@@ -26,18 +26,18 @@ namespace coursify_backend.Repository
             return await _context.Evaluations.AnyAsync(e => e.Id == evaluationId);
         }
 
-        public async Task<EvaluationDetailsDTO> GetByCourseId(int courseId)
+        public async Task<QuestionnaireDTO> GetByCourseId(int courseId)
         {
             return await _context.Evaluations
                 .Include(e => e.Course)
                 .Include(e => e.Questions)
                 .ThenInclude(q => q.Answers)
                 .Where(e => e.CourseId == courseId)
-                .Select(e => new EvaluationDetailsDTO
+                .Select(e => new QuestionnaireDTO
                 {
                     Id = e.Id,
                     CourseTitle = e.Course.Title,
-                    Questions = e.Questions.Select(q => new EvaluationQuestionsDTO
+                    Questions = e.Questions.Select(q => new QuestionDetailsDTO
                     {
                         QuestionId = q.Id,
                         Question = q.QuestionText,

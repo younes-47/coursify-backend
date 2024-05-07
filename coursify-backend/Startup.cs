@@ -118,6 +118,7 @@ namespace Courses_Platform_Backend
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IEvaluationService, EvaluationService>();
+            services.AddScoped<IQuizService, QuizService>();
         }
 
 

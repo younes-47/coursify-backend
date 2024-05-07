@@ -13,7 +13,7 @@ namespace coursify_backend.Interfaces.IRepository
         Task<int> GetTotal();
         Task<List<CourseDetailsDTO>> GetAvailable(string email);
         Task<CourseDetailsDTO> GetDetailsById(int id, string email);
-        Task<List<CourseDetailsDTO>> GetEnrolled(string email);
+        Task<List<EnrolledCourseDetailsDTO>> GetEnrolled(string email);
         Task<CourseContentDTO> GetContent(int courseId);
     }
 }

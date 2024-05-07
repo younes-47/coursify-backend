@@ -1,6 +1,6 @@
 ﻿namespace coursify_backend.DTO.GET
 {
-    public class EvaluationQuestionsDTO
+    public class QuestionDetailsDTO
     {
         public int QuestionId { get; set; }
         public string Question { get; set; } = null!;

@@ -104,22 +104,20 @@ namespace coursify_backend.Repository
                 .FirstAsync(c => c.Id == id);
         }
 
-        public async Task<List<CourseDetailsDTO>> GetEnrolled(string email)
+        public async Task<List<EnrolledCourseDetailsDTO>> GetEnrolled(string email)
         {
             return await _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.Enrollments)
+                .Include(c => c.Quiz)
                 .Where(c => c.Enrollments.Any(e => e.User.Email == email))
-                .Select(c => new CourseDetailsDTO
+                .Select(c => new EnrolledCourseDetailsDTO
                 {
                     Id = c.Id,
                     Title = c.Title,
                     Category = c.Category.Title,
                     Cover = c.Cover != "PLACEHOLDER" ? File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{c.Cover}") : null,
-                    TotalSections = c.Sections.Count,
-                    TotalSlides = c.Sections.SelectMany(s => s.Slides).Count(),
-                    TotalDocuments = c.Sections.SelectMany(s => s.Documents).Count(),
-                    IsEnrolled = true
+                    HighestQuizScore = c.Quiz.QuizAttempts.Where(qa => qa.User.Email == email).Max(qa => qa.Score)
                 })
                 .ToListAsync();
         }

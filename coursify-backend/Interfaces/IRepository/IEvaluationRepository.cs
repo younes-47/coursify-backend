@@ -8,7 +8,7 @@ namespace coursify_backend.Interfaces.IRepository
         Task<bool> Add(Evaluation evaluation);
         Task<bool> Delete(Evaluation evaluation);
         Task<bool> IsExisted(int evaluationId);
-        Task<EvaluationDetailsDTO> GetByCourseId(int courseId);
+        Task<QuestionnaireDTO> GetByCourseId(int courseId);
         Task<int> GetQuestionsCount(int evaluationId);
         Task<int> GetCourseId(int evaluationId);
     }

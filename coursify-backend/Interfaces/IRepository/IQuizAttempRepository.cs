@@ -5,5 +5,6 @@ namespace coursify_backend.Interfaces.IRepository
     public interface IQuizAttempRepository
     {
         Task<bool> DeleteCollection(ICollection<QuizAttempt> quizAttempts);
+        Task<bool> Add(QuizAttempt quizAttempt);
     }
 }

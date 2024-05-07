@@ -17,6 +17,8 @@ namespace coursify_backend.Controllers
         ICourseRepository courseRepository,
         IEvaluationRepository evaluationRepository,
         IEvaluationService evaluationService,
+        IQuizRepository quizRepository,
+        IQuizService quizService,
         IMapper mapper) : ControllerBase
     {
         private readonly IUserRepository _userRepository = userRepository;
@@ -24,6 +26,8 @@ namespace coursify_backend.Controllers
         private readonly ICourseRepository _courseRepository = courseRepository;
         private readonly IEvaluationRepository _evaluationRepository = evaluationRepository;
         private readonly IEvaluationService _evaluationService = evaluationService;
+        private readonly IQuizRepository _quizRepository = quizRepository;
+        private readonly IQuizService _quizService = quizService;
         private readonly IMapper _mapper = mapper;
 
         [HttpGet("Info")]
@@ -83,7 +87,7 @@ namespace coursify_backend.Controllers
             if(!await _courseRepository.IsExisted(courseId))
                 return NotFound("COURSE_NOT_FOUND");
 
-            EvaluationDetailsDTO evaluation = await _evaluationRepository.GetByCourseId(courseId);
+            QuestionnaireDTO evaluation = await _evaluationRepository.GetByCourseId(courseId);
             return Ok(evaluation);
         }
 
@@ -102,7 +106,7 @@ namespace coursify_backend.Controllers
         [HttpGet("courses/enrolled")]
         public async Task<IActionResult> GetEnrolledCourses()
         {
-            List<CourseDetailsDTO> courseInfos = await _courseRepository.GetEnrolled(HttpContext.User.Identity.Name);
+            List<EnrolledCourseDetailsDTO> courseInfos = await _courseRepository.GetEnrolled(HttpContext.User.Identity.Name);
             return Ok(courseInfos);
         }
 
@@ -114,6 +118,26 @@ namespace coursify_backend.Controllers
 
             CourseContentDTO courseContent = await _courseRepository.GetContent(courseId);
             return Ok(courseContent);
+        }
+
+        [HttpGet("course/quiz")]
+        public async Task<IActionResult> GetCourseQuiz([FromQuery] int courseId)
+        {
+            if(!await _courseRepository.IsExisted(courseId))
+                return NotFound("COURSE_NOT_FOUND");
+
+            QuestionnaireDTO quiz = await _quizRepository.GetByCourseId(courseId);
+            return Ok(quiz);
+        }
+
+        [HttpPost("course/quiz/pass")]
+        public async Task<IActionResult> PassCourseQuiz([FromBody] TestDTO quiz)
+        {
+            if(!await _quizRepository.IsExisted(quiz.Id))
+                return NotFound("QUIZ_NOT_FOUND");
+
+            decimal testResult = await _quizService.Pass(quiz, HttpContext.User.Identity.Name);
+            return Ok(testResult);
         }
 
     }
