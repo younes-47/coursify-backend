@@ -16,9 +16,13 @@ namespace coursify_backend.DTO.POST
         [CustomValidation(typeof(SectionDTO), "IsPdf")]
         public List<Byte[]> Documents { get; set; } = null!;
 
-        public static ValidationResult IsPng(List<Byte[]> Slides, ValidationContext context)
+        public static ValidationResult IsPng(List<Byte[]> slides, ValidationContext context)
         {
-            foreach (var slide in Slides)
+            if(slides == null)
+            {
+                return new ValidationResult("Une section doit au moins contenir un slide");
+            }
+            foreach (var slide in slides)
             {
                 if (slide.Length < 8 || slide[0] != 137 || slide[1] != 80 || slide[2] != 78 || slide[3] != 71 || slide[4] != 13 || slide[5] != 10 || slide[6] != 26 || slide[7] != 10)
                 {
@@ -29,9 +33,13 @@ namespace coursify_backend.DTO.POST
           
         }
 
-        public static ValidationResult IsPdf(List<Byte[]> Documents, ValidationContext context)
+        public static ValidationResult IsPdf(List<Byte[]> documents, ValidationContext context)
         {
-            foreach (var document in Documents)
+            if(documents == null)
+            {
+                return new ValidationResult("Une section doit au moins contenir un document");
+            }
+            foreach (var document in documents)
             {
                 if (document.Length < 4 || document[0] != 37 || document[1] != 80 || document[2] != 68 || document[3] != 70)
                 {
