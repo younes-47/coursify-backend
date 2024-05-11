@@ -9,6 +9,6 @@ namespace coursify_backend.DTO.POST
         public string Answer { get; set; } = null!;
 
         [Required(ErrorMessage = "Vous deverez spécidier si une réponse d'une question est juste ou non!")]
-        public bool IsCorrect { get; set; } = false;
+        public bool IsCorrect { get; set; }
     }
 }
