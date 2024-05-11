@@ -45,7 +45,7 @@ namespace coursify_backend.Services
             EmailDTO emailDTO = new()
             {
                 To = user.Email,
-                Subject = "Confirmer votre e-mail",
+                Subject = "Coursify - Confirmer votre e-mail",
                 Body = htmlContent
             };
 
@@ -82,7 +82,7 @@ namespace coursify_backend.Services
             EmailDTO emailDTO = new()
             {
                 To = user.Email,
-                Subject = "Réinitialiser votre mot de passe",
+                Subject = "Coursify - Réinitialiser votre mot de passe",
                 Body = htmlContent
             };
 
@@ -121,7 +121,7 @@ namespace coursify_backend.Services
                 EmailClient emailClient = new(_configuration["EmailSettings:ConnectionString"]);
 
                 var sender = _configuration["EmailSettings:Sender"];
-
+              
                 EmailSendOperation sendOperation = await emailClient.SendAsync(Azure.WaitUntil.Completed,
                     sender, 
                     emailDTO.To,
