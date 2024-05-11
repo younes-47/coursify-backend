@@ -8,9 +8,7 @@ namespace coursify_backend.Interfaces.IService
         EmailDTO GenerateVerificationEmail(User user);
 
         EmailDTO GeneratePasswordResetEmail(User user);
-
-        bool SendEmail(EmailDTO emailDTO);
-
+        Task<bool> SendEmailAzure(EmailDTO emailDTO);
         bool DeleteWholeFolder(int courseId);
     }
 }

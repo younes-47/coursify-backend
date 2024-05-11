@@ -42,11 +42,12 @@ namespace coursify_backend.Services
                 await _userRepository.Add(mappedUser);
 
                 EmailDTO emailDTO = _miscService.GenerateVerificationEmail(mappedUser);
-                result.Success = _miscService.SendEmail(emailDTO);
-                if (!result.Success)
+                result.Success = await _miscService.SendEmailAzure(emailDTO);
+                if (result.Success == false)
                 {
                     transaction.Rollback();
                     result.Message = "Échec de l'envoi de l'e-mail de vérification";
+                    result.Success = false;
                     return result;
                 }
                 await transaction.CommitAsync();
@@ -172,10 +173,13 @@ namespace coursify_backend.Services
                 }
                 user.EmailVerificationToken = _authService.CreateEmailVerficiationToken(email);     
                 EmailDTO emailDTO = _miscService.GenerateVerificationEmail(user);
-                result.Success = _miscService.SendEmail(emailDTO);
-                if (!result.Success)
+                result.Success = await _miscService.SendEmailAzure(emailDTO);
+                if (result.Success == false)
                 {
+                    transaction.Rollback();
                     result.Message = "ERR_SENDING_EMAIL";
+                    result.Success = false;
+                    return result;
                 }
                 await _userRepository.Update(user);
                 await transaction.CommitAsync();
@@ -208,10 +212,13 @@ namespace coursify_backend.Services
                 }
                 user.PasswordResetToken = _authService.CreatePasswordResetToken(email);    
                 EmailDTO emailDTO = _miscService.GeneratePasswordResetEmail(user);
-                result.Success = _miscService.SendEmail(emailDTO);
-                if (!result.Success)
+                result.Success = await _miscService.SendEmailAzure(emailDTO);
+                if (result.Success == false)
                 {
+                    transaction.Rollback();
                     result.Message = "Échec de l'envoi de l'e-mail de réinitialisation du mot de passe";
+                    result.Success = false;
+                    return result;
                 }
                 await _userRepository.Update(user);
                 await transaction.CommitAsync();

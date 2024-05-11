@@ -7,6 +7,6 @@ namespace coursify_backend.DTO.INTERNAL
     {
         public string To { get; set; } = null!;
         public string Subject { get; set; } = null!;
-        public TextPart Body { get; set; } = new(TextFormat.Html);
+        public string Body { get; set; } = null!;
     }
 }

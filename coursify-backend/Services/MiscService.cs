@@ -1,4 +1,5 @@
-﻿using coursify_backend.DTO.INTERNAL;
+﻿using Azure.Communication.Email;
+using coursify_backend.DTO.INTERNAL;
 using coursify_backend.Interfaces.IService;
 using coursify_backend.Models;
 using MailKit.Net.Smtp;
@@ -6,6 +7,7 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Hosting;
 using MimeKit;
 using System.Security.Cryptography;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace coursify_backend.Services
 {
@@ -19,9 +21,7 @@ namespace coursify_backend.Services
         {
             string verificationLink = $"{_configuration["EmailSettings:CoursifyFrontendUrl"]}/Verify/token/{user.EmailVerificationToken}/email/{user.Email}";
 
-            TextPart emailBody = new(MimeKit.Text.TextFormat.Html)
-            {
-                Text = $@"
+            string htmlContent = $@"
                     <!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd""><html dir=""ltr"" xmlns=""http://www.w3.org/1999/xhtml"" xmlns:o=""urn:schemas-microsoft-com:office:office"" lang=""fr""><head><meta charset=""UTF-8""><meta content=""width=device-width, initial-scale=1"" name=""viewport""><meta name=""x-apple-disable-message-reformatting""><meta http-equiv=""X-UA-Compatible"" content=""IE=edge""><meta content=""telephone=no"" name=""format-detection""><title>New Message</title> <!--[if (mso 16)]><style type=""text/css"">     a {{text-decoration: none;}}     </style><![endif]--> <!--[if gte mso 9]><style>sup {{ font-size: 100% !important; }}</style><![endif]--> <!--[if gte mso 9]><xml> <o:OfficeDocumentSettings> <o:AllowPNG></o:AllowPNG> <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
                     <![endif]--><style type=""text/css"">.rollover:hover .rollover-first {{ max-height:0px!important; display:none!important; }} .rollover:hover .rollover-second {{ max-height:none!important; display:block!important; }} .rollover span {{ font-size:0px; }} u + .body img ~ div div {{ display:none; }} #outlook a {{ padding:0; }} span.MsoHyperlink,span.MsoHyperlinkFollowed {{ color:inherit; mso-style-priority:99; }} a.es-button {{ mso-style-priority:100!important; text-decoration:none!important; }} a[x-apple-data-detectors] {{ color:inherit!important; text-decoration:none!important; font-size:inherit!important; font-family:inherit!important; font-weight:inherit!important; line-height:inherit!important; }} .es-desk-hidden {{ display:none; float:left; overflow:hidden; width:0; max-height:0; line-height:0; mso-hide:all; }} .es-button-border:hover > a.es-button {{ color:#ffffff!important; }}
                     @media only screen and (max-width:600px) {{.es-m-p0r {{ padding-right:0px!important }} .es-m-p0l {{ padding-left:0px!important }} *[class=""gmail-fix""] {{ display:none!important }} p, a {{ line-height:150%!important }} h1, h1 a {{ line-height:120%!important }} h2, h2 a {{ line-height:120%!important }} h3, h3 a {{ line-height:120%!important }} h4, h4 a {{ line-height:120%!important }} h5, h5 a {{ line-height:120%!important }} h6, h6 a {{ line-height:120%!important }} h1 {{ font-size:36px!important; text-align:left }} h2 {{ font-size:26px!important; text-align:left }} h3 {{ font-size:20px!important; text-align:left }} h4 {{ font-size:24px!important; text-align:left }} h5 {{ font-size:20px!important; text-align:left }} h6 {{ font-size:16px!important; text-align:left }} .es-header-body h1 a, .es-content-body h1 a, .es-footer-body h1 a {{ font-size:36px!important }} .es-header-body h2 a, .es-content-body h2 a, .es-footer-body h2 a {{ font-size:26px!important }}
@@ -39,14 +39,14 @@ namespace coursify_backend.Services
                     <td align=""center"" style=""padding:0;Margin:0;padding-top:10px;padding-bottom:10px""><span class=""es-button-border"" style=""border-style:solid;border-color:#2CB543;background:#5C68E2;border-width:0px;display:inline-block;border-radius:6px;width:auto""><a href=""{verificationLink}"" class=""es-button"" target=""_blank"" style=""mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;padding:10px 30px 10px 30px;display:inline-block;background:#5C68E2;border-radius:6px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #5C68E2;border-left-width:30px;border-right-width:30px"">Confirmer</a></span></td></tr> <tr>
                     <td align=""center"" class=""es-m-p0r es-m-p0l"" style=""Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px""><p style=""Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px""><strong>ce lien est valable 10 minutes</strong></p></td></tr></table></td></tr></table></td></tr></table></td></tr></table> <table cellpadding=""0"" cellspacing=""0"" class=""es-content"" align=""center"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important""><tr><td class=""es-info-area"" align=""center"" style=""padding:0;Margin:0""><table class=""es-content-body"" align=""center"" cellpadding=""0"" cellspacing=""0"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:transparent;width:600px"" bgcolor=""#FFFFFF""><tr>
                     <td align=""left"" style=""padding:20px;Margin:0""><table cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px""><tr><td align=""center"" valign=""top"" style=""padding:0;Margin:0;width:560px""><table cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px""><tr><td align=""center"" class=""es-infoblock"" style=""padding:0;Margin:0""><p style=""Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;letter-spacing:0;color:#999999;font-size:12px"">All rights reserved © Developed by <a target=""_blank"" href=""https://www.linkedin.com/in/younes-khoubaz/"" style=""mso-line-height-rule:exactly;text-decoration:underline;color:#999999;font-size:12px"">Younes Khoubaz.</a></p> </td></tr></table></td></tr></table></td></tr></table></td></tr></table>
-                    </td></tr></table></div></body></html>                "
-            };
+                    </td></tr></table></div></body></html>";
+            
 
             EmailDTO emailDTO = new()
             {
                 To = user.Email,
                 Subject = "Confirmer votre e-mail",
-                Body = emailBody
+                Body = htmlContent
             };
 
             return emailDTO;
@@ -56,9 +56,8 @@ namespace coursify_backend.Services
         {
             string passwordResetLink = $"{_configuration["EmailSettings:CoursifyFrontendUrl"]}/Password-reset/token/{user.PasswordResetToken}/email/{user.Email}";
 
-            TextPart emailBody = new(MimeKit.Text.TextFormat.Html)
-            {
-                Text = $@"
+
+            string htmlContent = $@"
                     <!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd""><html dir=""ltr"" xmlns=""http://www.w3.org/1999/xhtml"" xmlns:o=""urn:schemas-microsoft-com:office:office"" lang=""fr""><head><meta charset=""UTF-8""><meta content=""width=device-width, initial-scale=1"" name=""viewport""><meta name=""x-apple-disable-message-reformatting""><meta http-equiv=""X-UA-Compatible"" content=""IE=edge""><meta content=""telephone=no"" name=""format-detection""><title>New Message</title> <!--[if (mso 16)]><style type=""text/css"">     a {{text-decoration: none;}}     </style><![endif]--> <!--[if gte mso 9]><style>sup {{ font-size: 100% !important; }}</style><![endif]--> <!--[if gte mso 9]><xml> <o:OfficeDocumentSettings> <o:AllowPNG></o:AllowPNG> <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
                     <![endif]--><style type=""text/css"">.rollover:hover .rollover-first {{ max-height:0px!important; display:none!important; }} .rollover:hover .rollover-second {{ max-height:none!important; display:block!important; }} .rollover span {{ font-size:0px; }} u + .body img ~ div div {{ display:none; }} #outlook a {{ padding:0; }} span.MsoHyperlink,span.MsoHyperlinkFollowed {{ color:inherit; mso-style-priority:99; }} a.es-button {{ mso-style-priority:100!important; text-decoration:none!important; }} a[x-apple-data-detectors] {{ color:inherit!important; text-decoration:none!important; font-size:inherit!important; font-family:inherit!important; font-weight:inherit!important; line-height:inherit!important; }} .es-desk-hidden {{ display:none; float:left; overflow:hidden; width:0; max-height:0; line-height:0; mso-hide:all; }} .es-button-border:hover > a.es-button {{ color:#ffffff!important; }}
                     @media only screen and (max-width:600px) {{.es-m-p0r {{ padding-right:0px!important }} .es-m-p0l {{ padding-left:0px!important }} *[class=""gmail-fix""] {{ display:none!important }} p, a {{ line-height:150%!important }} h1, h1 a {{ line-height:120%!important }} h2, h2 a {{ line-height:120%!important }} h3, h3 a {{ line-height:120%!important }} h4, h4 a {{ line-height:120%!important }} h5, h5 a {{ line-height:120%!important }} h6, h6 a {{ line-height:120%!important }} h1 {{ font-size:36px!important; text-align:left }} h2 {{ font-size:26px!important; text-align:left }} h3 {{ font-size:20px!important; text-align:left }} h4 {{ font-size:24px!important; text-align:left }} h5 {{ font-size:20px!important; text-align:left }} h6 {{ font-size:16px!important; text-align:left }} .es-header-body h1 a, .es-content-body h1 a, .es-footer-body h1 a {{ font-size:36px!important }} .es-header-body h2 a, .es-content-body h2 a, .es-footer-body h2 a {{ font-size:26px!important }}
@@ -77,34 +76,57 @@ namespace coursify_backend.Services
                     <td align=""center"" class=""es-m-p0r es-m-p0l"" style=""Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px""><p style=""Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px""><strong>ce lien est valable 10 minutes</strong></p></td></tr></table></td></tr></table></td></tr></table></td></tr></table> <table cellpadding=""0"" cellspacing=""0"" class=""es-content"" align=""center"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important""><tr><td class=""es-info-area"" align=""center"" style=""padding:0;Margin:0""><table class=""es-content-body"" align=""center"" cellpadding=""0"" cellspacing=""0"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:transparent;width:600px"" bgcolor=""#FFFFFF""><tr>
                     <td align=""left"" style=""padding:20px;Margin:0""><table cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px""><tr><td align=""center"" valign=""top"" style=""padding:0;Margin:0;width:560px""><table cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px""><tr><td align=""center"" class=""es-infoblock"" style=""padding:0;Margin:0""><p style=""Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;letter-spacing:0;color:#999999;font-size:12px"">All rights reserved © Developed by <a target=""_blank"" href=""https://www.linkedin.com/in/younes-khoubaz/"" style=""mso-line-height-rule:exactly;text-decoration:underline;color:#999999;font-size:12px"">Younes Khoubaz.</a></p> </td></tr></table></td></tr></table></td></tr></table></td></tr></table>
                     </td></tr></table></div></body></html>
-                "
-            };
+                ";
+          
 
             EmailDTO emailDTO = new()
             {
                 To = user.Email,
                 Subject = "Réinitialiser votre mot de passe",
-                Body = emailBody
+                Body = htmlContent
             };
 
             return emailDTO;
         }
 
-        public bool SendEmail(EmailDTO emailDTO)
+        // Send email through SMTP Provider
+        //public bool SendEmail(EmailDTO emailDTO)
+        //{
+        //    try
+        //    {
+        //        var email = new MimeMessage();
+        //        email.From.Add(new MailboxAddress("Coursify", _configuration["EmailSettings:EmailUsername"]));
+        //        email.To.Add(MailboxAddress.Parse(emailDTO.To));
+        //        email.Subject = emailDTO.Subject;
+        //        email.Body = emailDTO.Body; // The body must be : TextPart emailBody = new(MimeKit.Text.TextFormat.Html) { Text = "HTML content" };
+    
+        //        using var smtp = new SmtpClient();
+        //        smtp.Connect(_configuration["EmailSettings:SmtpHost"], int.Parse(_configuration["EmailSettings:SmtpPort"]), SecureSocketOptions.StartTls);
+        //        smtp.Authenticate(_configuration["EmailSettings:EmailUsername"], _configuration["EmailSettings:EmailPassword"]);
+        //        smtp.Send(email);
+        //        smtp.Disconnect(true);
+
+        //        return true;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        public async Task<bool> SendEmailAzure(EmailDTO emailDTO)
         {
             try
             {
-                var email = new MimeMessage();
-                email.From.Add(new MailboxAddress("Coursify", _configuration["EmailSettings:EmailUsername"]));
-                email.To.Add(MailboxAddress.Parse(emailDTO.To));
-                email.Subject = emailDTO.Subject;
-                email.Body = emailDTO.Body;
+                EmailClient emailClient = new(_configuration["EmailSettings:ConnectionString"]);
 
-                using var smtp = new SmtpClient();
-                smtp.Connect(_configuration["EmailSettings:SmtpHost"], int.Parse(_configuration["EmailSettings:SmtpPort"]), SecureSocketOptions.StartTls);
-                smtp.Authenticate(_configuration["EmailSettings:EmailUsername"], _configuration["EmailSettings:EmailPassword"]);
-                smtp.Send(email);
-                smtp.Disconnect(true);
+                var sender = _configuration["EmailSettings:Sender"];
+
+                EmailSendOperation sendOperation = await emailClient.SendAsync(Azure.WaitUntil.Completed,
+                    sender, 
+                    emailDTO.To,
+                    emailDTO.Subject,
+                    emailDTO.Body);
 
                 return true;
             }
