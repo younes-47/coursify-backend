@@ -51,7 +51,6 @@ namespace coursify_backend.Services
                 }
                 await transaction.CommitAsync();
                 result.Success = true;
-                return result;
 
             }
             catch (Exception e)
@@ -152,6 +151,7 @@ namespace coursify_backend.Services
         public async Task<ProcessResult> SendVerficationEmail(string email)
         {
             var result = new ProcessResult();
+            var transaction = _coursifyContext.Database.BeginTransaction();
             try
             {
                 var user = await _userRepository.GetByEmailAsync(email);
@@ -178,6 +178,8 @@ namespace coursify_backend.Services
                     result.Message = "ERR_SENDING_EMAIL";
                 }
                 await _userRepository.Update(user);
+                await transaction.CommitAsync();
+                result.Success = true;
             }
             catch (Exception e)
             {
@@ -190,6 +192,7 @@ namespace coursify_backend.Services
         public async Task<ProcessResult> SendPasswordResetEmail(string email)
         {
             var result = new ProcessResult();
+            var transaction = _coursifyContext.Database.BeginTransaction();
             try
             {
                 var user = await _userRepository.GetByEmailAsync(email);
@@ -211,6 +214,8 @@ namespace coursify_backend.Services
                     result.Message = "Échec de l'envoi de l'e-mail de réinitialisation du mot de passe";
                 }
                 await _userRepository.Update(user);
+                await transaction.CommitAsync();
+                result.Success = true;
             }
             catch (Exception e)
             {

@@ -108,7 +108,7 @@ namespace coursify_backend.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
