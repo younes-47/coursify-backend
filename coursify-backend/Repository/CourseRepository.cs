@@ -97,8 +97,8 @@ namespace coursify_backend.Repository
                     Description = c.Description,
                     Cover = c.Cover != "PLACEHOLDER" ? File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{c.Cover}") : null,
                     TotalSections = c.Sections.Count,
-                    TotalSlides = c.Sections.Select(s => s.Slides.Count).Count(),
-                    TotalDocuments = c.Sections.Select(s => s.Documents.Count).Count(),
+                    TotalSlides = c.Sections.SelectMany(s => s.Slides).Count(),
+                    TotalDocuments = c.Sections.SelectMany(s => s.Documents).Count(),
                     IsEnrolled = c.Enrollments.Any(e => e.User.Email == email)
                 })
                 .FirstAsync(c => c.Id == id);
