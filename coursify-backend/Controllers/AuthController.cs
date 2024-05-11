@@ -54,11 +54,11 @@ namespace coursify_backend.Controllers
             // Set the refresh token in an http-only cookie
             HttpContext.Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
             {
-                Domain = "localhost",
+                
                 Expires = DateTime.Now.AddDays(1),
                 Secure = true,
                 HttpOnly = true,
-                Path = "/",
+                SameSite = SameSiteMode.None,
             });
 
             return Ok(new {authResponse.AccessToken, authResponse.Role});
