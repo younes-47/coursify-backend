@@ -91,7 +91,7 @@ public partial class CoursifyContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("Cover");
 
-            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.Title).HasMaxLength(255);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Courses).HasForeignKey(d => d.CategoryId);
