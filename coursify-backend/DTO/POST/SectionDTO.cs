@@ -15,7 +15,7 @@ namespace coursify_backend.DTO.POST
         // Documents Not required
         [CustomValidation(typeof(SectionDTO), "IsPdf")]
         public List<Byte[]> Documents { get; set; } = null!;
-
+         
         public static ValidationResult IsPng(List<Byte[]> slides, ValidationContext context)
         {
             if(slides == null)

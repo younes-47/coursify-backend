@@ -18,11 +18,11 @@ namespace coursify_backend.DTO.POST
             {
                 return new ValidationResult("Il doit y avoir exactement 4 réponses pour chaque question du quiz");
             }
-            if (answers.Any(a => a.IsCorrect))
+            if (answers.Count(a => a.IsCorrect) != 1)
             {
-                return ValidationResult.Success;
-            }        
-            return new ValidationResult("Il doit y avoir exactement une réponse correcte, parmi les réponses d'une question du quiz");
+                return new ValidationResult("Il doit y avoir exactement une réponse correcte, parmi les réponses d'une question du quiz");
+            }
+            return ValidationResult.Success;
         }
 
     }
