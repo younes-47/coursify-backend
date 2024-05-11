@@ -36,8 +36,8 @@ namespace Courses_Platform_Backend
             {
                 options.AddPolicy("CorsPolicy", builder =>
                 {
-                    builder.WithOrigins("http://localhost:3000")
-                        .WithOrigins("https://coursify.azurewebsites.net/")
+                    builder.WithOrigins("https://coursify.azurewebsites.net/")
+                        .WithOrigins("http://localhost:3000")
                         .AllowCredentials()
                         .AllowAnyMethod()
                         .AllowAnyHeader()
