@@ -15,6 +15,8 @@ namespace coursify_backend.Controllers
     public class UserController(IUserRepository userRepository,
         IUserService userService,
         ICourseRepository courseRepository,
+        ISectionRepository sectionRepository,
+        ISectionService sectionService,
         IEvaluationRepository evaluationRepository,
         IEvaluationService evaluationService,
         IQuizRepository quizRepository,
@@ -24,6 +26,8 @@ namespace coursify_backend.Controllers
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IUserService _userService = userService;
         private readonly ICourseRepository _courseRepository = courseRepository;
+        private readonly ISectionRepository _sectionRepository = sectionRepository;
+        private readonly ISectionService _sectionService = sectionService;
         private readonly IEvaluationRepository _evaluationRepository = evaluationRepository;
         private readonly IEvaluationService _evaluationService = evaluationService;
         private readonly IQuizRepository _quizRepository = quizRepository;
@@ -119,6 +123,27 @@ namespace coursify_backend.Controllers
             CourseContentDTO courseContent = await _courseRepository.GetContent(courseId);
             return Ok(courseContent);
         }
+
+        [HttpPut("course/section/complete")]
+        public async Task<IActionResult> CompleteSection([FromQuery] int sectionId)
+        {
+            if(!await _sectionRepository.IsExisted(sectionId))
+                return NotFound("SECTION_NOT_FOUND");
+
+            bool result = await _sectionService.MarkCompleted(HttpContext.User.Identity.Name, sectionId);
+            return Ok(result);
+        }
+
+        [HttpPut("course/section/incomplete")]
+        public async Task<IActionResult> IncompleteSection([FromQuery] int sectionId)
+        {
+            if(!await _sectionRepository.IsExisted(sectionId))
+                return NotFound("SECTION_NOT_FOUND");
+
+            bool result = await _sectionService.MarkIncomplete(HttpContext.User.Identity.Name, sectionId);
+            return Ok(result);
+        }
+        
 
         [HttpGet("course/quiz")]
         public async Task<IActionResult> GetCourseQuiz([FromQuery] int courseId)

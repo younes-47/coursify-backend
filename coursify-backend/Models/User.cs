@@ -33,6 +33,8 @@ public partial class User
 
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
+    public virtual ICollection<CourseProgress> CourseProgresses { get; set; } = new List<CourseProgress>();
+
     public virtual ICollection<EvaluationAttempt> EvaluationAttempts { get; set; } = new List<EvaluationAttempt>();
 
     public virtual ICollection<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();

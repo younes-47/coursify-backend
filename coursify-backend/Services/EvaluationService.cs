@@ -12,6 +12,8 @@ namespace coursify_backend.Services
         IUserRepository userRepository,
         IEvaluationAttemptRepository evaluationAttemptRepository,
         IEnrollementRepository enrollementRepository,
+        ISectionRepository sectionRepository,
+        ICourseProgressRepository courseProgressRepository,
         IQuestionRepository questionRepository) : IEvaluationService
     {
         private readonly CoursifyContext _context = context;
@@ -19,6 +21,8 @@ namespace coursify_backend.Services
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IEvaluationAttemptRepository _evaluationAttemptRepository = evaluationAttemptRepository;
         private readonly IEnrollementRepository _enrollementRepository = enrollementRepository;
+        private readonly ISectionRepository _sectionRepository = sectionRepository;
+        private readonly ICourseProgressRepository _courseProgressRepository = courseProgressRepository;
         private readonly IQuestionRepository _questionRepository = questionRepository;
 
         public async Task<TestResult> Evaluate(TestDTO testDTO, string email)
@@ -60,6 +64,17 @@ namespace coursify_backend.Services
                         UserId = userId,
                     };
                     await _enrollementRepository.Add(enrollment);
+
+                    List<Section> sections = await _sectionRepository.GetByCourseId(enrollment.CourseId);
+                    foreach (Section section in sections)
+                    {
+                        CourseProgress courseProgress = new()
+                        {
+                            SectionId = section.Id,
+                            UserId = userId,
+                        };
+                        await _courseProgressRepository.Add(courseProgress);
+                    }
                 }
 
                 await transaction.Result.CommitAsync();

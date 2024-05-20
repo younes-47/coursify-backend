@@ -112,12 +112,14 @@ namespace Courses_Platform_Backend
             services.AddScoped<IEnrollementRepository, EnrollementRepository>();
             services.AddScoped<IQuizAttempRepository, QuizAttemptRepository>();
             services.AddScoped<IEvaluationAttemptRepository, EvaluationAttemptRepository>();
+            services.AddScoped<ICourseProgressRepository, CourseProgressRepository>();
 
             /* Inject the Services */
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IMiscService, MiscService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IEvaluationService, EvaluationService>();
             services.AddScoped<IQuizService, QuizService>();
         }

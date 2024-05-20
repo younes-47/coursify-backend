@@ -110,6 +110,8 @@ namespace coursify_backend.Repository
                 .Include(c => c.Category)
                 .Include(c => c.Enrollments)
                 .Include(c => c.Quiz)
+                .Include(c => c.Sections)
+                .ThenInclude(s => s.CourseProgresses)
                 .Where(c => c.Enrollments.Any(e => e.User.Email == email))
                 .Select(c => new EnrolledCourseDetailsDTO
                 {
@@ -117,7 +119,9 @@ namespace coursify_backend.Repository
                     Title = c.Title,
                     Category = c.Category.Title,
                     Cover = c.Cover != "PLACEHOLDER" ? File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{c.Cover}") : null,
-                    HighestQuizScore = c.Quiz.QuizAttempts.Where(qa => qa.User.Email == email).Max(qa => qa.Score)
+                    HighestQuizScore = c.Quiz.QuizAttempts.Where(qa => qa.User.Email == email).Max(qa => qa.Score),
+                    IsCompleted = c.Sections.All(s => s.CourseProgresses.Any(cp => cp.User.Email == email && cp.IsCompleted)),
+                    Progress = Math.Round(((c.Sections.SelectMany(s => s.CourseProgresses).Count(cp => cp.User.Email == email && cp.IsCompleted) / (decimal)c.Sections.Count) * 100) , 2)
                 })
                 .ToListAsync();
         }
@@ -129,13 +133,17 @@ namespace coursify_backend.Repository
                 .ThenInclude(s => s.Slides)
                 .Include(c => c.Sections)
                 .ThenInclude(s => s.Documents)
+                .Include(c => c.Sections)
+                .ThenInclude(s => s.CourseProgresses)
                 .Select(c => new CourseContentDTO
                 {
                     Id = c.Id,
                     Title = c.Title,
-                    Sections = c.Sections.Select(s => new SectionDTO
+                    Sections = c.Sections.Select(s => new coursify_backend.DTO.GET.SectionDTO
                     {
+                        Id = s.Id,
                         Title = s.Title,
+                        IsCompleted = s.CourseProgresses.Any(cp => cp.SectionId == s.Id && cp.IsCompleted),
                         Slides = s.Slides.Select(s => File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{s.SlideName}")).ToList(),
                         Documents = s.Documents.Select(d => File.ReadAllBytes(_webHostEnvironment.WebRootPath + $"\\{c.Id}\\{d.DocumentName}")).ToList()
                     }).ToList()

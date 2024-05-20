@@ -22,6 +22,7 @@ namespace coursify_backend.Services
         IQuizAttempRepository quizAttempRepository,
         IEvaluationAttemptRepository evaluationAttemptRepository,
         IEnrollementRepository enrollementRepository,
+        ICourseProgressRepository courseProgressRepository,
         IWebHostEnvironment webHostEnvironment,
         IMiscService miscService) : ICourseService
     {
@@ -38,6 +39,7 @@ namespace coursify_backend.Services
         private readonly IQuizAttempRepository _quizAttempRepository = quizAttempRepository;
         private readonly IEvaluationAttemptRepository _evaluationAttemptRepository = evaluationAttemptRepository;
         private readonly IEnrollementRepository _enrollementRepository = enrollementRepository;
+        private readonly ICourseProgressRepository _courseProgressRepository = courseProgressRepository;
         private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
         private readonly IMiscService _miscService = miscService;
 
@@ -224,6 +226,10 @@ namespace coursify_backend.Services
                     await _evaluationRepository.Delete(course.Evaluation);
                 }
 
+                // DELETE COURSE PROGRESSES
+                var courseProgresses = await _courseProgressRepository.GetByCourseId(courseId);
+                await _courseProgressRepository.DeleteCollection(courseProgresses);
+
                 // DELETE SECTIONS AND RELATED DATA
                 foreach (Section section in course.Sections)
                 {
@@ -234,6 +240,8 @@ namespace coursify_backend.Services
 
                 // DELETE ENROLLMENTS
                 await _enrollementRepository.DeleteCollection(course.Enrollments);
+
+               
 
                 // DELETE COURSE
                 await _courseRepository.Delete(course);

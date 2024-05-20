@@ -22,6 +22,8 @@ public partial class CoursifyContext : DbContext
 
     public virtual DbSet<Course> Courses { get; set; }
 
+    public virtual DbSet<CourseProgress> CourseProgresses { get; set; }
+
     public virtual DbSet<Document> Documents { get; set; }
 
     public virtual DbSet<Enrollment> Enrollments { get; set; }
@@ -95,6 +97,31 @@ public partial class CoursifyContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(255);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Courses).HasForeignKey(d => d.CategoryId);
+        });
+
+        modelBuilder.Entity<CourseProgress>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__CoursePr__3214EC07D3A3A3A3");
+
+            entity.ToTable("CourseProgress");
+
+            entity.HasIndex(e => e.SectionId, "IX_CourseProgress_SectionId");
+
+            entity.HasIndex(e => e.UserId, "IX_CourseProgress_UserId");
+
+            entity.Property(e => e.CreateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Section).WithMany(p => p.CourseProgresses)
+                .HasForeignKey(d => d.SectionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SECTION_COURSE_PROGRESS");
+
+            entity.HasOne(d => d.User).WithMany(p => p.CourseProgresses)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_USER_COURSE_PROGRESS");
         });
 
         modelBuilder.Entity<Document>(entity =>
