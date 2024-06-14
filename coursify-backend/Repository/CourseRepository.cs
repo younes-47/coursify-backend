@@ -48,6 +48,7 @@ namespace coursify_backend.Repository
                 .Include(c => c.Quiz)
                 .ThenInclude(q => q.QuizAttempts)
                 .Include(c => c.Enrollments)
+                .AsSplitQuery()
                 .FirstAsync(c => c.Id == id);
         }
 
